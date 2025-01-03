@@ -6,6 +6,7 @@ import logging
 from dotenv import load_dotenv
 from data_manager import DataManager
 from utils import extract_number_and_sum, setup_logging
+from datetime import datetime, timedelta
 
 # Configuration du logging
 setup_logging()
@@ -23,6 +24,9 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Initialisation du gestionnaire de données
 data_manager = DataManager('data.json')
+
+# Variable pour stocker le temps de démarrage du bot
+start_time = datetime.now()
 
 @tasks.loop(hours=1)
 async def update_presence():
@@ -81,8 +85,16 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-# Ajout des commandes slash ici...
-# Exemple : leaderboard_server, leaderboard_global, config, set_send_public, set_send_message, set_enable_reactions
+# Ajout de la commande /info
+@bot.tree.command(name="info", description="Affiche l'uptime du bot, le cluster et la shard")
+async def info(interaction: discord.Interaction):
+    uptime = datetime.now() - start_time
+    data = await data_manager.load_data()
+    cluster = data.get("info", {}).get("cluster", "N/A")
+    shard = data.get("info", {}).get("shard", "N/A")
+    await interaction.response.send_message(
+        f"Uptime: {str(timedelta(seconds=uptime.seconds))}\nCluster: {cluster}\nShard: {shard}"
+    )
 
 @bot.event
 async def on_command_error(ctx, error):
