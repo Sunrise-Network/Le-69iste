@@ -46,7 +46,8 @@ check_prerequisites() {
     if [ ! -f "$ENV_FILE" ]; then
         log "❌ Le fichier $ENV_FILE n'existe pas."
         exit 1
-    }
+    fi
+}  # Ajout de l'accolade fermante manquante
 
 # Création du réseau Docker s'il n'existe pas
 create_network() {
