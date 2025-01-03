@@ -47,7 +47,6 @@ check_prerequisites() {
         log "❌ Le fichier $ENV_FILE n'existe pas."
         exit 1
     }
-}
 
 # Création du réseau Docker s'il n'existe pas
 create_network() {
