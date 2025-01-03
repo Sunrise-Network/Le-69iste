@@ -47,14 +47,14 @@ check_prerequisites() {
         log "❌ Le fichier $ENV_FILE n'existe pas."
         exit 1
     fi
-}  # Ajout de l'accolade fermante manquante
+}
 
 # Création du réseau Docker s'il n'existe pas
 create_network() {
     if ! docker network inspect "$DOCKER_NETWORK" &>/dev/null; then
         log "🌐 Création du réseau Docker $DOCKER_NETWORK"
         docker network create "$DOCKER_NETWORK" || { log "❌ Échec de la création du réseau"; exit 1; }
-    }
+    fi
 }
 
 # Sauvegarde des données si nécessaire
@@ -64,7 +64,7 @@ backup_data() {
         local backup_file="${BACKUP_DIR}/backup_$(date +%Y%m%d_%H%M%S).tar"
         log "💾 Création d'une sauvegarde dans $backup_file"
         docker exec "$CONTAINER_NAME" tar czf - /app/data > "$backup_file" || true
-    }
+    fi
 }
 
 # Mise à jour du code
