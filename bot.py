@@ -74,7 +74,7 @@ def extract_number_and_sum(message):
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="les nombres rigolos"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"les nombres rigolos sur {len(bot.guilds)} serveurs."))
     logger.info(f'Bot {bot.user} connecté à Discord')
     try:
         synced = await bot.tree.sync()
@@ -103,7 +103,7 @@ async def on_message(message):
         data['stats'][guild_id][user_id]['count_69'] += 1
         save_data(data)
 
-        logger.info(f"69 trouvé dans le message de {message.author} sur {message.guild.name} (ID: {message.guild.id})")
+        logger.info(f"69 trouvé dans le message de {message.author.id} sur {message.guild.id}")
 
         # Appliquer les configurations
         if config['enable_reactions']:
@@ -122,7 +122,7 @@ async def on_message(message):
                     await message.author.send(response)
                     await message.add_reaction("📨")  # Indique que le message a été envoyé en privé
                 except discord.Forbidden:
-                    logger.warning(f"Impossible d'envoyer un message privé à {message.author}")
+                    logger.warning(f"Impossible d'envoyer un message privé à {message.author.id}")
                     await message.channel.send(
                         f"{message.author.mention} Je ne peux pas vous envoyer de message privé. "
                         "Vérifiez que vous acceptez les messages privés de ce serveur."
@@ -132,7 +132,7 @@ async def on_message(message):
 
 @bot.tree.command(name="leaderboard_server", description="Affiche le classement des utilisateurs avec le plus de 69 sur ce serveur.")
 async def leaderboard_server(interaction: discord.Interaction):
-    logger.info(f"Commande leaderboard_server utilisée sur {interaction.guild.name}")
+    logger.info(f"Commande leaderboard_server utilisée sur {interaction.guild.id}")
     data = load_data()
     guild_id = str(interaction.guild.id)
 
@@ -173,7 +173,7 @@ async def leaderboard_global(interaction: discord.Interaction):
 
 @bot.tree.command(name="config", description="Affiche ou configure les paramètres du bot.")
 async def config(interaction: discord.Interaction):
-    logger.info(f"Commande config utilisée sur {interaction.guild.name}")
+    logger.info(f"Commande config utilisée sur {interaction.guild.id}")
     data = load_data()
     guild_id = str(interaction.guild.id)
     config = get_guild_config(guild_id, data)
@@ -187,7 +187,7 @@ async def config(interaction: discord.Interaction):
 @bot.tree.command(name="set_send_public", description="Configure si les messages doivent être envoyés en public ou en privé.")
 @app_commands.describe(send_public="Définir si les messages sont envoyés en public (True) ou en privé (False).")
 async def set_send_public(interaction: discord.Interaction, send_public: bool):
-    logger.info(f"Modification de send_public à {send_public} sur {interaction.guild.name}")
+    logger.info(f"Modification de send_public à {send_public} sur {interaction.guild.id}")
     data = load_data()
     guild_id = str(interaction.guild.id)
     config = get_guild_config(guild_id, data)
@@ -198,7 +198,7 @@ async def set_send_public(interaction: discord.Interaction, send_public: bool):
 @bot.tree.command(name="set_send_message", description="Active ou désactive l'envoi des messages.")
 @app_commands.describe(send_message="Définir si l'envoi des messages est activé (True) ou désactivé (False).")
 async def set_send_message(interaction: discord.Interaction, send_message: bool):
-    logger.info(f"Modification de send_message à {send_message} sur {interaction.guild.name}")
+    logger.info(f"Modification de send_message à {send_message} sur {interaction.guild.id}")
     data = load_data()
     guild_id = str(interaction.guild.id)
     config = get_guild_config(guild_id, data)
@@ -209,7 +209,7 @@ async def set_send_message(interaction: discord.Interaction, send_message: bool)
 @bot.tree.command(name="set_enable_reactions", description="Active ou désactive les réactions.")
 @app_commands.describe(enable_reactions="Activer ou désactiver les réactions (True ou False).")
 async def set_enable_reactions(interaction: discord.Interaction, enable_reactions: bool):
-    logger.info(f"Modification de enable_reactions à {enable_reactions} sur {interaction.guild.name}")
+    logger.info(f"Modification de enable_reactions à {enable_reactions} sur {interaction.guild.id}")
     data = load_data()
     guild_id = str(interaction.guild.id)
     config = get_guild_config(guild_id, data)
