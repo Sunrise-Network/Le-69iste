@@ -15,6 +15,7 @@ venv.bak/
 .vscode/
 *.swp
 *.swo
+manual_update.sh
 
 # Ignorer les fichiers de logs et de rapports
 *.log
