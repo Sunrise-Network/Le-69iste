@@ -50,10 +50,10 @@ async def on_message(message):
 
     numbers, total = extract_number_and_sum(message.content)
     if total == 69:
-        data = data_manager.load_data()
+        data = await data_manager.load_data()
         guild_id = str(message.guild.id)
         user_id = str(message.author.id)
-        config = data_manager.get_guild_config(guild_id)
+        config = await data_manager.get_guild_config(guild_id)
 
         # Mettre à jour les statistiques
         data_manager.update_stats(guild_id, user_id, 'count_69')
