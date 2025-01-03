@@ -123,12 +123,6 @@ async def on_message(message):
 
         logger.info(f"69 trouvé dans le message de {message.author.id} sur {message.guild.id}")
 
-        # Appliquer les configurations
-        if config['enable_reactions']:
-            reactions = ["6️⃣", "9️⃣", "👀"]
-            for emoji in reactions:
-                await message.add_reaction(emoji)
-
         if config['send_message']:
             response = "Génial ! Tous les nombres de votre message s'additionnent à 69 !\n\n"
             response += "```" + " + ".join(map(str, numbers)) + f" = {total}" + "```"
@@ -145,6 +139,10 @@ async def on_message(message):
                         f"{message.author.mention} Je ne peux pas vous envoyer de message privé. "
                         "Vérifiez que vous acceptez les messages privés de ce serveur."
                     )
+        if config['enable_reactions']:
+            reactions = ["6️⃣", "9️⃣", "👀"]
+            for emoji in reactions:
+                await message.add_reaction(emoji)
 
     await bot.process_commands(message)
 
