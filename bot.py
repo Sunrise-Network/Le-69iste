@@ -124,7 +124,7 @@ async def on_message(message):
         logger.info(f"69 trouvé dans le message de {message.author.id} sur {message.guild.id}")
 
         if config['send_message']:
-            response = "Génial ! Tous les nombres de votre message s'additionnent à 69 !\n\n"
+            response = "Génial ! La somme des nombres dans votre message est égale a 69 !\n\n"
             response += "```" + " + ".join(map(str, numbers)) + f" = {total}" + "```"
             
             if config['send_public']:
@@ -135,10 +135,6 @@ async def on_message(message):
                     await message.add_reaction("📨")  # Indique que le message a été envoyé en privé
                 except discord.Forbidden:
                     logger.warning(f"Impossible d'envoyer un message privé à {message.author.id}")
-                    await message.channel.send(
-                        f"{message.author.mention} Je ne peux pas vous envoyer de message privé. "
-                        "Vérifiez que vous acceptez les messages privés de ce serveur."
-                    )
         if config['enable_reactions']:
             reactions = ["6️⃣", "9️⃣", "👀"]
             for emoji in reactions:
