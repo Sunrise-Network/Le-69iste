@@ -1,3 +1,65 @@
-.env
+# Ignorer les fichiers et répertoires Python compilés
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignorer les environnements virtuels
+env/
 venv/
-data.json
+ENV/
+env.bak/
+venv.bak/
+
+# Ignorer les fichiers de configuration de l'IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Ignorer les fichiers de logs et de rapports
+*.log
+*.pot
+*.mo
+*.bak
+*.tmp
+
+# Ignorer les fichiers générés par l'éditeur
+*.pyre/
+*.tox/
+*.coverage
+*.hypothesis/
+nosetests.xml
+coverage.xml
+*.coveragerc
+
+# Ignorer les fichiers de distribution
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# Ignorer les fichiers de cache de pip
+pip-wheel-metadata/
+*.pip
+
+# Ignorer les fichiers de cache de package manager
+__pypackages__/
+
+# Ignorer les fichiers de configuration de système
+.DS_Store
+Thumbs.db
+
+# Ignorer les fichiers personnels et sensibles
+*.env
+*.ini
+*.json
+
+# Ignorer les fichiers de Jupyter Notebook
+.ipynb_checkpoints/
+
+# Ignorer les fichiers spécifiques à certains outils
+*.coveragerc
+pytest.ini
+tox.ini
+*.editorconfig
