@@ -5,6 +5,7 @@ import json
 import os
 import re
 import logging
+import asyncio
 from datetime import datetime
 
 # Configuration du logging
@@ -72,9 +73,15 @@ def extract_number_and_sum(message):
     total = sum(numbers)
     return numbers, total
 
+async def update_presence():
+    while True:
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"les nombres rigolos sur {len(bot.guilds)} serveurs."))
+        await asyncio.sleep(3600)
+
 @bot.event
 async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"les nombres rigolos sur {len(bot.guilds)} serveurs."))
+    asyncio.create_task(update_presence())
     logger.info(f'Bot {bot.user} connecté à Discord')
     try:
         synced = await bot.tree.sync()
