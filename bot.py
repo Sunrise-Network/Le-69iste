@@ -23,10 +23,15 @@ logger = logging.getLogger('DiscordBot')
 from dotenv import load_dotenv
 load_dotenv()
 
+TOKEN = os.getenv('DISCORD_TOKEN')
+
 DATA_FILE = 'data.json'
 DATA_STORAGE = 'json'
 START_TIME = datetime.now()
 ENVIRONEMENT = os.getenv('ENVIRONEMENT', 'DEVELOPMENT')
+CLUSTER = os.getenv('CLUSTER', 'N/A')
+SHARD = os.getenv('SHARD', 'N/A')
+REGION = os.getenv('REGION', 'N/A')
 
 # Initialisation des intentions et du bot
 intents = discord.Intents.default()
@@ -50,16 +55,19 @@ def load_data():
                 content = f.read().strip()
                 if not content:
                     logger.warning("Fichier de données vide, création d'une nouvelle structure")
-                    return {"config": {}, "stats": {}, "info": {"cluster": "main", "shard": "0"}}
-                return json.loads(content)
+                    return {"config": {}, "stats": {}, "info": {"cluster": CLUSTER, "shard": SHARD, "region": REGION}}
+                data = json.loads(content)
+                if "info" not in data:
+                    data["info"] = {"cluster": CLUSTER, "shard": SHARD, "region": REGION}
+                return data
         except FileNotFoundError:
             logger.warning(f"Fichier {DATA_FILE} non trouvé, création d'une nouvelle structure")
-            return {"config": {}, "stats": {}}
+            return {"config": {}, "stats": {}, "info": {"cluster": CLUSTER, "shard": SHARD, "region": REGION}}
         except json.JSONDecodeError:
             logger.error(f"Erreur de décodage JSON dans {DATA_FILE}. Voulez vous créer une nouvelle structure ? Toutes les données du bot serons perdues (O/N)")
             response = input()
             if response.lower() == 'o' or response.lower() == 'oui' or response.lower() == 'y' or response.lower() == 'yes':
-                return {"config": {}, "stats": {}}
+                return {"config": {}, "stats": {}, "info": {"cluster": CLUSTER, "shard": SHARD, "region": REGION}}
             else:
                 logger.error("Arrêt du bot")
                 exit(1)
@@ -107,7 +115,16 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    
+    owner = [int(os.getenv('OWNER_ID'))]
+    
     if message.author.bot:
+        return
+    
+    if message.content == "+-restart" and message.author.id in owner:
+        logger.info("Commande de restart reçue")
+        await message.channel.send("Redémarage du bot...")
+        await bot.close()
         return
 
     numbers, total = extract_number_and_sum(message.content)
@@ -147,7 +164,7 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-@bot.tree.command(name="ping", help="Renvoie la latence du bot.")
+@bot.tree.command(name="ping", description="Renvoie la latence du bot.")
 async def ping(ctx):
     logger.info(f"Commande ping utilisée sur {ctx.guild.id}")
     await ctx.send(f"Pong ! Latence: {round(bot.latency * 1000)}ms")
@@ -157,11 +174,13 @@ async def info(interaction: discord.Interaction):
     logger.info(f"Commande info utilisée par {interaction.user}")
     data = load_data()
     
-    cluster = data.get("info", {}).get("cluster", "main")
-    shard = data.get("info", {}).get("shard", "0")
+    region = data.get("info", {}).get("region", "N/A")
+    cluster = data.get("info", {}).get("cluster", "N/A")
+    shard = data.get("info", {}).get("shard", "N/A")
     uptime = get_uptime()
 
     embed = discord.Embed(title="Informations du Bot", color=discord.Color.green())
+    embed.add_field(name="Region", value=region, inline=True)
     embed.add_field(name="Cluster", value=cluster, inline=True)
     embed.add_field(name="Shard", value=shard, inline=True)
     embed.add_field(name="Uptime", value=uptime, inline=True)
@@ -263,18 +282,8 @@ async def on_command_error(ctx, error):
 async def on_error(event, *args, **kwargs):
     logger.error(f"Erreur dans l'événement {event}: {args} {kwargs}")
 
-# Récupération du token et démarrage du bot
-token = os.getenv('DISCORD_TOKEN')
-if ENVIRONEMENT == "DEVELOPMENT":
-    token = os.getenv('DISCORD_DEVELOPMENT_TOKEN')
-elif ENVIRONEMENT == "PRODUCTION":
-    token = os.getenv('DISCORD_TOKEN')
-else:
-    logger.warning("Environnement inconnu, utilisation du token de développement")
-    token = os.getenv('DISCORD_DEVELOPMENT_TOKEN')
-
-if token:
+if len(TOKEN) > 0:
     logger.info("Démarrage du bot...")
-    bot.run(token)
+    bot.run(TOKEN)
 else:
     logger.critical("Aucun token trouvé dans le fichier .env")
