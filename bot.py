@@ -47,7 +47,7 @@ def load_data():
             content = f.read().strip()
             if not content:
                 logger.warning("Fichier de données vide, création d'une nouvelle structure")
-                return {"config": {}, "stats": {}}
+                return {"config": {}, "stats": {}, "info": {"cluster": "main", "shard": "0"}}
             return json.loads(content)
     except FileNotFoundError:
         logger.warning(f"Fichier {DATA_FILE} non trouvé, création d'une nouvelle structure")
