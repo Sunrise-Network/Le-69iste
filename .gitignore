@@ -16,6 +16,7 @@ venv.bak/
 *.swp
 *.swo
 manual_update.sh
+start.sh
 
 # Ignorer les fichiers de logs et de rapports
 *.log
