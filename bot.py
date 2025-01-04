@@ -102,6 +102,11 @@ async def update_presence():
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"les nombres rigolos sur {len(bot.guilds)} serveurs."))
         await asyncio.sleep(3600)
 
+async def send_error_embed(ctx, message, error):
+    embed = discord.Embed(title="Erreur", description=message, color=discord.Color.red())
+    embed.add_field(name="Detail", value=str(error), inline=False)
+    await ctx.send(embed=embed)
+
 @bot.event
 async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"les nombres rigolos sur {len(bot.guilds)} serveurs."))
@@ -166,114 +171,146 @@ async def on_message(message):
 
 @bot.tree.command(name="ping", description="Renvoie la latence du bot.")
 async def ping(ctx):
-    logger.info(f"Commande ping utilisée sur {ctx.guild.id}")
-    await ctx.send(f"Pong ! Latence: {round(bot.latency * 1000)}ms")
+    try:
+        logger.info(f"Commande ping utilisée sur {ctx.guild.id}")
+        await ctx.send(f"Pong ! Latence: {round(bot.latency * 1000)}ms")
+    except Exception as e:
+        logger.error(f"Erreur lors de l'envoi de la commande ping: {e}")
+        await send_error_embed(ctx, "Erreur lors de l'envoi de la commande `ping`", e)
 
 @bot.tree.command(name="info", description="Affiche le cluster, la shard et l'uptime du bot.")
 async def info(interaction: discord.Interaction):
-    logger.info(f"Commande info utilisée par {interaction.user}")
-    data = load_data()
-    
-    region = data.get("info", {}).get("region", "N/A")
-    cluster = data.get("info", {}).get("cluster", "N/A")
-    shard = data.get("info", {}).get("shard", "N/A")
-    uptime = get_uptime()
+    try:
+        logger.info(f"Commande info utilisée par {interaction.user}")
+        data = load_data()
 
-    embed = discord.Embed(title="Informations du Bot", color=discord.Color.green())
-    embed.add_field(name="Region", value=region, inline=True)
-    embed.add_field(name="Cluster", value=cluster, inline=True)
-    embed.add_field(name="Shard", value=shard, inline=True)
-    embed.add_field(name="Uptime", value=uptime, inline=True)
+        region = data.get("info", {}).get("region", "N/A")
+        cluster = data.get("info", {}).get("cluster", "N/A")
+        shard = data.get("info", {}).get("shard", "N/A")
+        uptime = get_uptime()
 
-    await interaction.response.send_message(embed=embed)
+        embed = discord.Embed(title="Informations du Bot", color=discord.Color.green())
+        embed.add_field(name="Region", value=region, inline=True)
+        embed.add_field(name="Cluster", value=cluster, inline=True)
+        embed.add_field(name="Shard", value=shard, inline=True)
+        embed.add_field(name="Uptime", value=uptime, inline=True)
+
+        await interaction.response.send_message(embed=embed)
+    except Exception as e:
+        logger.error(f"Erreur lors de l'envoi de la commande info: {e}")
+        await send_error_embed(interaction, "Erreur lors de l'envoi de la commande `info`", e)
 
 @bot.tree.command(name="leaderboard_server", description="Affiche le classement des utilisateurs avec le plus de 69 sur ce serveur.")
 async def leaderboard_server(interaction: discord.Interaction):
-    logger.info(f"Commande leaderboard_server utilisée sur {interaction.guild.id}")
-    data = load_data()
-    guild_id = str(interaction.guild.id)
+    try:
+        logger.info(f"Commande leaderboard_server utilisée sur {interaction.guild.id}")
+        data = load_data()
+        guild_id = str(interaction.guild.id)
 
-    if guild_id not in data['stats']:
-        logger.warning(f"Aucune donnée pour le serveur {guild_id}")
-        await interaction.response.send_message("Aucune donnée disponible pour ce serveur.")
-        return
+        if guild_id not in data['stats']:
+            logger.warning(f"Aucune donnée pour le serveur {guild_id}")
+            await interaction.response.send_message("Aucune donnée disponible pour ce serveur.")
+            return
 
-    leaderboard = sorted(data['stats'][guild_id].items(), key=lambda x: x[1]['count_69'], reverse=True)
-    embed = discord.Embed(title="Classement des utilisateurs avec le plus de 69 sur ce serveur", color=discord.Color.blue())
+        leaderboard = sorted(data['stats'][guild_id].items(), key=lambda x: x[1]['count_69'], reverse=True)
+        embed = discord.Embed(title="Classement des utilisateurs avec le plus de 69 sur ce serveur", color=discord.Color.blue())
 
-    for user_id, stats in leaderboard[:10]:
-        user = await bot.fetch_user(int(user_id))
-        embed.add_field(name=user.display_name, value=f"{stats['count_69']} fois", inline=False)
+        for user_id, stats in leaderboard[:10]:
+            user = await bot.fetch_user(int(user_id))
+            embed.add_field(name=user.display_name, value=f"{stats['count_69']} fois", inline=False)
 
-    await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed)
+    except Exception as e:
+        logger.error(f"Erreur lors de l'envoi de la commande leaderboard_server: {e}")
+        await send_error_embed(interaction, "Erreur lors de l'envoi de la commande `leaderboard_server`", e)
 
 @bot.tree.command(name="leaderboard_global", description="Affiche le classement global des utilisateurs avec le plus de 69.")
 async def leaderboard_global(interaction: discord.Interaction):
-    logger.info(f"Commande leaderboard_global utilisée par {interaction.user}")
-    data = load_data()
-    global_stats = {}
+    try:
+        logger.info(f"Commande leaderboard_global utilisée par {interaction.user}")
+        data = load_data()
+        global_stats = {}
 
-    for guild_stats in data['stats'].values():
-        for user_id, stats in guild_stats.items():
-            if isinstance(stats, dict) and 'count_69' in stats:
-                if user_id not in global_stats:
-                    global_stats[user_id] = 0
-                global_stats[user_id] += stats['count_69']
+        for guild_stats in data['stats'].values():
+            for user_id, stats in guild_stats.items():
+                if isinstance(stats, dict) and 'count_69' in stats:
+                    if user_id not in global_stats:
+                        global_stats[user_id] = 0
+                    global_stats[user_id] += stats['count_69']
 
-    leaderboard = sorted(global_stats.items(), key=lambda x: x[1], reverse=True)
-    embed = discord.Embed(title="Classement global des utilisateurs avec le plus de 69", color=discord.Color.gold())
+        leaderboard = sorted(global_stats.items(), key=lambda x: x[1], reverse=True)
+        embed = discord.Embed(title="Classement global des utilisateurs avec le plus de 69", color=discord.Color.gold())
 
-    for user_id, count in leaderboard[:10]:
-        user = await bot.fetch_user(int(user_id))
-        embed.add_field(name=user.display_name, value=f"{count} fois", inline=False)
+        for user_id, count in leaderboard[:10]:
+            user = await bot.fetch_user(int(user_id))
+            embed.add_field(name=user.display_name, value=f"{count} fois", inline=False)
 
-    await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed)
+    except Exception as e:
+        logger.error(f"Erreur lors de l'envoi de la commande leaderboard_global: {e}")
+        await send_error_embed(interaction, "Erreur lors de l'envoi de la commande `leaderboard_global`", e)
 
 @bot.tree.command(name="config", description="Affiche ou configure les paramètres du bot.")
 async def config(interaction: discord.Interaction):
-    logger.info(f"Commande config utilisée sur {interaction.guild.id}")
-    data = load_data()
-    guild_id = str(interaction.guild.id)
-    config = get_guild_config(guild_id, data)
+    try:
+        logger.info(f"Commande config utilisée sur {interaction.guild.id}")
+        data = load_data()
+        guild_id = str(interaction.guild.id)
+        config = get_guild_config(guild_id, data)
 
-    embed = discord.Embed(title="Configuration du Bot", color=discord.Color.blue())
-    embed.add_field(name="Envoi des messages", value="Public" if config['send_public'] else "Privé", inline=True)
-    embed.add_field(name="Envoi des messages activé", value="Oui" if config['send_message'] else "Non", inline=True)
-    embed.add_field(name="Réactions activées", value="Oui" if config['enable_reactions'] else "Non", inline=True)
-    await interaction.response.send_message(embed=embed)
+        embed = discord.Embed(title="Configuration du Bot", color=discord.Color.blue())
+        embed.add_field(name="Envoi des messages", value="Public" if config['send_public'] else "Privé", inline=True)
+        embed.add_field(name="Envoi des messages activé", value="Oui" if config['send_message'] else "Non", inline=True)
+        embed.add_field(name="Réactions activées", value="Oui" if config['enable_reactions'] else "Non", inline=True)
+        await interaction.response.send_message(embed=embed)
+    except Exception as e:
+        logger.error(f"Erreur lors de l'envoi de la commande config: {e}")
+        await send_error_embed(interaction, "Erreur lors de l'envoi de la commande `config`", e)
 
 @bot.tree.command(name="set_send_public", description="Configure si les messages doivent être envoyés en public ou en privé.")
 @app_commands.describe(send_public="Définir si les messages sont envoyés en public (True) ou en privé (False).")
 async def set_send_public(interaction: discord.Interaction, send_public: bool):
-    logger.info(f"Modification de send_public à {send_public} sur {interaction.guild.id}")
-    data = load_data()
-    guild_id = str(interaction.guild.id)
-    config = get_guild_config(guild_id, data)
-    config['send_public'] = send_public
-    save_data(data)
-    await interaction.response.send_message(f"Envoi des messages {'public' if send_public else 'privé'} configuré.")
+    try:
+        logger.info(f"Modification de send_public à {send_public} sur {interaction.guild.id}")
+        data = load_data()
+        guild_id = str(interaction.guild.id)
+        config = get_guild_config(guild_id, data)
+        config['send_public'] = send_public
+        save_data(data)
+        await interaction.response.send_message(f"Envoi des messages {'public' if send_public else 'privé'} configuré.")
+    except Exception as e:
+        logger.error(f"Erreur lors de la modification de send_public: {e}")
+        await send_error_embed(interaction, "Erreur lors de la modification de `send_public`", e)
 
 @bot.tree.command(name="set_send_message", description="Active ou désactive l'envoi des messages.")
 @app_commands.describe(send_message="Définir si l'envoi des messages est activé (True) ou désactivé (False).")
 async def set_send_message(interaction: discord.Interaction, send_message: bool):
-    logger.info(f"Modification de send_message à {send_message} sur {interaction.guild.id}")
-    data = load_data()
-    guild_id = str(interaction.guild.id)
-    config = get_guild_config(guild_id, data)
-    config['send_message'] = send_message
-    save_data(data)
-    await interaction.response.send_message(f"Envoi des messages {'activé' if send_message else 'désactivé'}.")
+    try:
+        logger.info(f"Modification de send_message à {send_message} sur {interaction.guild.id}")
+        data = load_data()
+        guild_id = str(interaction.guild.id)
+        config = get_guild_config(guild_id, data)
+        config['send_message'] = send_message
+        save_data(data)
+        await interaction.response.send_message(f"Envoi des messages {'activé' if send_message else 'désactivé'}.")
+    except Exception as e:
+        logger.error(f"Erreur lors de la modification de send_message: {e}")
+        await send_error_embed(interaction, "Erreur lors de la modification de `send_message`", e)
 
 @bot.tree.command(name="set_enable_reactions", description="Active ou désactive les réactions.")
 @app_commands.describe(enable_reactions="Activer ou désactiver les réactions (True ou False).")
 async def set_enable_reactions(interaction: discord.Interaction, enable_reactions: bool):
-    logger.info(f"Modification de enable_reactions à {enable_reactions} sur {interaction.guild.id}")
-    data = load_data()
-    guild_id = str(interaction.guild.id)
-    config = get_guild_config(guild_id, data)
-    config['enable_reactions'] = enable_reactions
-    save_data(data)
-    await interaction.response.send_message(f"Réactions {'activées' if enable_reactions else 'désactivées'}.")
+    try:
+        logger.info(f"Modification de enable_reactions à {enable_reactions} sur {interaction.guild.id}")
+        data = load_data()
+        guild_id = str(interaction.guild.id)
+        config = get_guild_config(guild_id, data)
+        config['enable_reactions'] = enable_reactions
+        save_data(data)
+        await interaction.response.send_message(f"Réactions {'activées' if enable_reactions else 'désactivées'}.")
+    except Exception as e:
+        logger.error(f"Erreur lors de la modification de enable_reactions: {e}")
+        await send_error_embed(interaction, "Erreur lors de la modification de `enable_reactions`", e)
 
 @bot.event
 async def on_command_error(ctx, error):
