@@ -24,7 +24,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DATA_FILE = 'data.json'
+DATA_STORAGE = 'json'
 START_TIME = datetime.now()
+ENVIRONEMENT = os.getenv('ENVIRONEMENT', 'DEVELOPMENT')
 
 # Initialisation des intentions et du bot
 intents = discord.Intents.default()
@@ -42,24 +44,27 @@ def get_uptime():
     return f"{days} jours, {hours} heures, {minutes} minutes et {seconds} secondes"
 
 def load_data():
-    try:
-        with open(DATA_FILE, 'r') as f:
-            content = f.read().strip()
-            if not content:
-                logger.warning("Fichier de données vide, création d'une nouvelle structure")
-                return {"config": {}, "stats": {}, "info": {"cluster": "main", "shard": "0"}}
-            return json.loads(content)
-    except FileNotFoundError:
-        logger.warning(f"Fichier {DATA_FILE} non trouvé, création d'une nouvelle structure")
-        return {"config": {}, "stats": {}}
-    except json.JSONDecodeError:
-        logger.error(f"Erreur de décodage JSON dans {DATA_FILE}. Voulez vous créer une nouvelle structure ? Toutes les données du bot serons perdues (O/N)")
-        response = input()
-        if response.lower() == 'o' or response.lower() == 'oui' or response.lower() == 'y' or response.lower() == 'yes':
+    if DATA_STORAGE == "json":
+        try:
+            with open(DATA_FILE, 'r') as f:
+                content = f.read().strip()
+                if not content:
+                    logger.warning("Fichier de données vide, création d'une nouvelle structure")
+                    return {"config": {}, "stats": {}, "info": {"cluster": "main", "shard": "0"}}
+                return json.loads(content)
+        except FileNotFoundError:
+            logger.warning(f"Fichier {DATA_FILE} non trouvé, création d'une nouvelle structure")
             return {"config": {}, "stats": {}}
-        else:
-            logger.error("Arrêt du bot")
-            exit(1)
+        except json.JSONDecodeError:
+            logger.error(f"Erreur de décodage JSON dans {DATA_FILE}. Voulez vous créer une nouvelle structure ? Toutes les données du bot serons perdues (O/N)")
+            response = input()
+            if response.lower() == 'o' or response.lower() == 'oui' or response.lower() == 'y' or response.lower() == 'yes':
+                return {"config": {}, "stats": {}}
+            else:
+                logger.error("Arrêt du bot")
+                exit(1)
+    elif DATA_STORAGE == "mysql":
+        pass
 
 def save_data(data):
     try:
@@ -142,7 +147,7 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-@bot.command(name="ping", help="Renvoie la latence du bot.")
+@bot.tree.command(name="ping", help="Renvoie la latence du bot.")
 async def ping(ctx):
     logger.info(f"Commande ping utilisée sur {ctx.guild.id}")
     await ctx.send(f"Pong ! Latence: {round(bot.latency * 1000)}ms")
@@ -260,6 +265,14 @@ async def on_error(event, *args, **kwargs):
 
 # Récupération du token et démarrage du bot
 token = os.getenv('DISCORD_TOKEN')
+if ENVIRONEMENT == "DEVELOPMENT":
+    token = os.getenv('DISCORD_DEVELOPMENT_TOKEN')
+elif ENVIRONEMENT == "PRODUCTION":
+    token = os.getenv('DISCORD_TOKEN')
+else:
+    logger.warning("Environnement inconnu, utilisation du token de développement")
+    token = os.getenv('DISCORD_DEVELOPMENT_TOKEN')
+
 if token:
     logger.info("Démarrage du bot...")
     bot.run(token)
