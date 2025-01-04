@@ -8,7 +8,7 @@ Vous pouvez inviter **Le69iste** à rejoindre votre serveur en cliquant sur ce l
 
 ## Sunrise Network
 
-Ce projet vous est généreusement fourni par [Sunrise Network](https://sunrisenetwork.eu). N'hésitez pas à rejoindre notre serveur Discord pour obtenir du support ou juste pour discuter : [Rejoignez notre Discord](https://sunrisenetwork.eu/discord)
+Ce projet vous est généreusement proposé par [Sunrise Network](https://sunrisenetwork.eu). N'hésitez pas à rejoindre notre serveur Discord pour obtenir du support ou juste pour discuter : [Rejoignez notre Discord](https://sunrisenetwork.eu/discord)
 
 ## Contribuer
 
@@ -18,3 +18,5 @@ N'hésitez pas à ouvrir une issue ou une PR si vous avez des idées d'améliora
 ## Licence
 
 Ce projet est fourni sous la licence Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International. Voir [LICENSE](LICENSE.md) pour plus de détails.
+
+<p style="font-size:12px; color:gray;">© 2025 Sunrise Network</p>
