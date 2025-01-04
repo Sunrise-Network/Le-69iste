@@ -215,9 +215,10 @@ async def leaderboard_global(interaction: discord.Interaction):
 
     for guild_stats in data['stats'].values():
         for user_id, stats in guild_stats.items():
-            if user_id not in global_stats:
-                global_stats[user_id] = 0
-            global_stats[user_id] += stats['count_69']
+            if isinstance(stats, dict) and 'count_69' in stats:
+                if user_id not in global_stats:
+                    global_stats[user_id] = 0
+                global_stats[user_id] += stats['count_69']
 
     leaderboard = sorted(global_stats.items(), key=lambda x: x[1], reverse=True)
     embed = discord.Embed(title="Classement global des utilisateurs avec le plus de 69", color=discord.Color.gold())
