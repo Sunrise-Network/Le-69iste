@@ -152,8 +152,8 @@ async def info(interaction: discord.Interaction):
     logger.info(f"Commande info utilisée par {interaction.user}")
     data = load_data()
     
-    cluster = data.get("info", {}).get("cluster", "N/A")
-    shard = data.get("info", {}).get("shard", "N/A")
+    cluster = data.get("info", {}).get("cluster", "main")
+    shard = data.get("info", {}).get("shard", "0")
     uptime = get_uptime()
 
     embed = discord.Embed(title="Informations du Bot", color=discord.Color.green())
