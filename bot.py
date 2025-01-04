@@ -175,8 +175,8 @@ async def ping(ctx):
         logger.info(f"Commande ping utilisée sur {ctx.guild.id}")
         await ctx.send(f"Pong ! Latence: {round(bot.latency * 1000)}ms")
     except Exception as e:
-        logger.error(f"Erreur lors de l'envoi de la commande ping: {e}")
         await send_error_embed(ctx, "Erreur lors de l'envoi de la commande `ping`", e)
+        logger.error(f"Erreur lors de l'envoi de la commande ping: {e}")
 
 @bot.tree.command(name="info", description="Affiche le cluster, la shard et l'uptime du bot.")
 async def info(interaction: discord.Interaction):
@@ -197,8 +197,8 @@ async def info(interaction: discord.Interaction):
 
         await interaction.response.send_message(embed=embed)
     except Exception as e:
-        logger.error(f"Erreur lors de l'envoi de la commande info: {e}")
         await send_error_embed(interaction, "Erreur lors de l'envoi de la commande `info`", e)
+        logger.error(f"Erreur lors de l'envoi de la commande info: {e}")
 
 @bot.tree.command(name="leaderboard_server", description="Affiche le classement des utilisateurs avec le plus de 69 sur ce serveur.")
 async def leaderboard_server(interaction: discord.Interaction):
@@ -221,8 +221,8 @@ async def leaderboard_server(interaction: discord.Interaction):
 
         await interaction.response.send_message(embed=embed)
     except Exception as e:
-        logger.error(f"Erreur lors de l'envoi de la commande leaderboard_server: {e}")
         await send_error_embed(interaction, "Erreur lors de l'envoi de la commande `leaderboard_server`", e)
+        logger.error(f"Erreur lors de l'envoi de la commande leaderboard_server: {e}")
 
 @bot.tree.command(name="leaderboard_global", description="Affiche le classement global des utilisateurs avec le plus de 69.")
 async def leaderboard_global(interaction: discord.Interaction):
@@ -247,8 +247,8 @@ async def leaderboard_global(interaction: discord.Interaction):
 
         await interaction.response.send_message(embed=embed)
     except Exception as e:
-        logger.error(f"Erreur lors de l'envoi de la commande leaderboard_global: {e}")
         await send_error_embed(interaction, "Erreur lors de l'envoi de la commande `leaderboard_global`", e)
+        logger.error(f"Erreur lors de l'envoi de la commande leaderboard_global: {e}")
 
 @bot.tree.command(name="config", description="Affiche ou configure les paramètres du bot.")
 async def config(interaction: discord.Interaction):
@@ -264,8 +264,8 @@ async def config(interaction: discord.Interaction):
         embed.add_field(name="Réactions activées", value="Oui" if config['enable_reactions'] else "Non", inline=True)
         await interaction.response.send_message(embed=embed)
     except Exception as e:
-        logger.error(f"Erreur lors de l'envoi de la commande config: {e}")
         await send_error_embed(interaction, "Erreur lors de l'envoi de la commande `config`", e)
+        logger.error(f"Erreur lors de l'envoi de la commande config: {e}")
 
 @bot.tree.command(name="set_send_public", description="Configure si les messages doivent être envoyés en public ou en privé.")
 @app_commands.describe(send_public="Définir si les messages sont envoyés en public (True) ou en privé (False).")
@@ -279,8 +279,8 @@ async def set_send_public(interaction: discord.Interaction, send_public: bool):
         save_data(data)
         await interaction.response.send_message(f"Envoi des messages {'public' if send_public else 'privé'} configuré.")
     except Exception as e:
-        logger.error(f"Erreur lors de la modification de send_public: {e}")
         await send_error_embed(interaction, "Erreur lors de la modification de `send_public`", e)
+        logger.error(f"Erreur lors de la modification de send_public: {e}")
 
 @bot.tree.command(name="set_send_message", description="Active ou désactive l'envoi des messages.")
 @app_commands.describe(send_message="Définir si l'envoi des messages est activé (True) ou désactivé (False).")
@@ -294,8 +294,8 @@ async def set_send_message(interaction: discord.Interaction, send_message: bool)
         save_data(data)
         await interaction.response.send_message(f"Envoi des messages {'activé' if send_message else 'désactivé'}.")
     except Exception as e:
-        logger.error(f"Erreur lors de la modification de send_message: {e}")
         await send_error_embed(interaction, "Erreur lors de la modification de `send_message`", e)
+        logger.error(f"Erreur lors de la modification de send_message: {e}")
 
 @bot.tree.command(name="set_enable_reactions", description="Active ou désactive les réactions.")
 @app_commands.describe(enable_reactions="Activer ou désactiver les réactions (True ou False).")
@@ -309,8 +309,8 @@ async def set_enable_reactions(interaction: discord.Interaction, enable_reaction
         save_data(data)
         await interaction.response.send_message(f"Réactions {'activées' if enable_reactions else 'désactivées'}.")
     except Exception as e:
-        logger.error(f"Erreur lors de la modification de enable_reactions: {e}")
         await send_error_embed(interaction, "Erreur lors de la modification de `enable_reactions`", e)
+        logger.error(f"Erreur lors de la modification de enable_reactions: {e}")
 
 @bot.event
 async def on_command_error(ctx, error):
