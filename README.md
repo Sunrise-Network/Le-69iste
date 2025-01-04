@@ -18,3 +18,5 @@ N'hésitez pas à ouvrir une issue ou une PR si vous avez des idées d'améliora
 ## Licence
 
 Ce projet est fourni sous la licence Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International. Voir [LICENSE](LICENSE.md) pour plus de détails.
+
+<p style="font-size:12px; color:gray;">© 2025 Sunrise Network</p>
